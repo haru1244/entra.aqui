@@ -3,48 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localização do Visitante</title>
+    <title>Você me ama?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .hidden {
+            display: none;
+        }
+        .question-container {
+            margin-top: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Nada será mostrado inicialmente, até que o usuário permita o acesso à localização -->
+    <h1>Teste de amor! ❤️</h1>
+    <div class="question-container" id="question-container">
+        <p>Você me ama?</p>
+        <button onclick="respondWithMovement('sim')">Sim</button>
+        <button onclick="respondWithMovement('nao')">Não</button>
+    </div>
+
+    <div id="second-question" class="hidden">
+        <p>Você vai me obedecer para sempre?</p>
+        <button onclick="finalResponse('sim')">Sim</button>
+        <button onclick="finalResponse('nao')">Não</button>
+    </div>
+
+    <div id="result" class="hidden">
+        <p id="result-text"></p>
+    </div>
+
     <script>
-        // Verifica se o navegador suporta geolocalização
-        if ("geolocation" in navigator) {
-            // Pede a localização assim que a página for carregada
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var latitude = position.coords.latitude;
-                var longitude = position.coords.longitude;
+        function respond(resposta) {
+            const questionContainer = document.getElementById("question-container");
+            const secondQuestionContainer = document.getElementById("second-question");
+            const resultDiv = document.getElementById("result");
+            const resultText = document.getElementById("result-text");
 
-                // Usando uma API de geolocalização reversa para obter a localização exata
-                var apiKey = "SUA_API_KEY";  // Substitua com sua chave de API
-                var url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
+            if (resposta === "sim") {
+                questionContainer.style.display = "none";
+                secondQuestionContainer.style.display = "block";
+            } else {
+                resultText.innerHTML = "";
+                resultDiv.style.display = "none";
+                questionContainer.style.display = "block";
+            }
+        }
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.results.length > 0) {
-                            var cidade = data.results[0].components.city || "Cidade não encontrada";
-                            var estado = data.results[0].components.state || "Estado não encontrado";
-                            var pais = data.results[0].components.country || "País não encontrado";
+        function finalResponse(resposta) {
+            const secondQuestionContainer = document.getElementById("second-question");
+            const resultDiv = document.getElementById("result");
+            const resultText = document.getElementById("result-text");
 
-                            // Exibe a localização detalhada
-                            alert(`Sua localização: ${cidade}, ${estado}, ${pais}`);
-                        } else {
-                            alert("Não foi possível obter a localização detalhada.");
-                        }
-                    })
-                    .catch(error => {
-                        alert("Erro ao obter a localização detalhada.");
-                        console.log(error);
-                    });
-            }, function(error) {
-                alert("Não foi possível obter sua localização.");
-                console.log(error);
-            });
-        } else {
-            alert("Geolocalização não suportada no seu navegador.");
+            secondQuestionContainer.style.display = "none";
+            resultDiv.style.display = "block";
+
+            if (resposta === "sim") {
+                resultText.innerHTML = "Te amo muito ❤️";
+            } else if (resposta === "nao") {
+                resultText.innerHTML = "Volta para sua ex que é melhor que eu 😒😒";
+            }
+        }
+
+        function moveQuestion() {
+            const questionContainer = document.getElementById("question-container");
+            // Gerar posições aleatórias para mover o botão "Não"
+            const maxWidth = window.innerWidth - questionContainer.offsetWidth;
+            const maxHeight = window.innerHeight - questionContainer.offsetHeight;
+
+            const randomX = Math.floor(Math.random() * maxWidth);
+            const randomY = Math.floor(Math.random() * maxHeight);
+
+            questionContainer.style.left = randomX + 'px';
+            questionContainer.style.top = randomY + 'px';
+        }
+
+        function respondWithMovement(resposta) {
+            if (resposta === 'nao') {
+                moveQuestion();
+            }
+            respond(resposta);
         }
     </script>
 </body>
 </html>
-
