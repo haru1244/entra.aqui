@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Localização Atual</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+    #localizacao {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Obter Localização</h1>
+  <button onclick="obterLocalizacao()">Clique para permitir</button>
+  <div id="localizacao"></div>
+
+  <script>
+    function obterLocalizacao() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(mostrarLocalizacao, mostrarErro);
+      } else {
+        document.getElementById("localizacao").innerText = "Geolocalização não suportada neste navegador.";
+      }
+    }
+
+    function mostrarLocalizacao(posicao) {
+      const latitude = posicao.coords.latitude;
+      const longitude = posicao.coords.longitude;
+      document.getElementById("localizacao").innerText = 
+        `Latitude: ${latitude}\nLongitude: ${longitude}`;
+    }
+
+    function mostrarErro(erro) {
+      switch (erro.code) {
+        case erro.PERMISSION_DENIED:
+          alert("Você negou o acesso à localização.");
+          break;
+        case erro.POSITION_UNAVAILABLE:
+          alert("Informações de localização indisponíveis.");
+          break;
+        case erro.TIMEOUT:
+          alert("Tempo para obter localização esgotado.");
+          break;
+        default:
+          alert("Erro desconhecido.");
+      }
+    }
+  </script>
+</body>
+</html>
