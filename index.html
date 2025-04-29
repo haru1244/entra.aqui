@@ -1,61 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Localização Atual</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f2f2f2;
-    }
-    #localizacao {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localização do Visitante</title>
 </head>
 <body>
-  <h1>Obter Localização</h1>
-  <button onclick="obterLocalizacao()">Clique para permitir</button>
-  <div id="localizacao"></div>
+    <!-- Nada será mostrado inicialmente, até que o usuário permita o acesso à localização -->
+    <script>
+        // Verifica se o navegador suporta geolocalização
+        if ("geolocation" in navigator) {
+            // Pede a localização assim que a página for carregada
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
 
-  <script>
-    function obterLocalizacao() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(mostrarLocalizacao, mostrarErro);
-      } else {
-        document.getElementById("localizacao").innerText = "Geolocalização não suportada neste navegador.";
-      }
-    }
+                // Usando uma API de geolocalização reversa para obter a localização exata
+                var apiKey = "SUA_API_KEY";  // Substitua com sua chave de API
+                var url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
 
-    function mostrarLocalizacao(posicao) {
-      const latitude = posicao.coords.latitude;
-      const longitude = posicao.coords.longitude;
-      document.getElementById("localizacao").innerText = 
-        `Latitude: ${latitude}\nLongitude: ${longitude}`;
-    }
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results.length > 0) {
+                            var cidade = data.results[0].components.city || "Cidade não encontrada";
+                            var estado = data.results[0].components.state || "Estado não encontrado";
+                            var pais = data.results[0].components.country || "País não encontrado";
 
-    function mostrarErro(erro) {
-      switch (erro.code) {
-        case erro.PERMISSION_DENIED:
-          alert("Você negou o acesso à localização.");
-          break;
-        case erro.POSITION_UNAVAILABLE:
-          alert("Informações de localização indisponíveis.");
-          break;
-        case erro.TIMEOUT:
-          alert("Tempo para obter localização esgotado.");
-          break;
-        default:
-          alert("Erro desconhecido.");
-      }
-    }
-  </script>
+                            // Exibe a localização detalhada
+                            alert(`Sua localização: ${cidade}, ${estado}, ${pais}`);
+                        } else {
+                            alert("Não foi possível obter a localização detalhada.");
+                        }
+                    })
+                    .catch(error => {
+                        alert("Erro ao obter a localização detalhada.");
+                        console.log(error);
+                    });
+            }, function(error) {
+                alert("Não foi possível obter sua localização.");
+                console.log(error);
+            });
+        } else {
+            alert("Geolocalização não suportada no seu navegador.");
+        }
+    </script>
 </body>
 </html>
+
